@@ -1,1 +1,1 @@
-## Lesson two
+## React stopwatch
