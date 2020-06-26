@@ -16,8 +16,9 @@ export default class Stopwatch extends Component {
 
     tick = () => {
         this.setState(state => {
+            const newDate = moment(state.date).add(1, 'seconds');
             return {
-                date: state.date.add(1, 'seconds'),
+                date: newDate,
             };
         });
     }
@@ -36,7 +37,6 @@ export default class Stopwatch extends Component {
             this.cleanTimer();
         }
         const id = setInterval(this.tick, 1000);
-        console.log("timer id: ", id);
         this.setState({
             isActive: true,
             timerId: id,
@@ -52,7 +52,6 @@ export default class Stopwatch extends Component {
 
     cleanTimer = () => {
         const {timerId} = this.state;
-        console.log("clear timer with id: ", timerId);
         clearInterval(timerId);
         this.setState({
             timerId: -1,
@@ -65,12 +64,30 @@ export default class Stopwatch extends Component {
         });
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const {timerId, date} = this.state;
+        const {timerId: nextTimerId, date: nextDate} = nextState;
+
+        return !(timerId === nextTimerId && date.get('second') === nextDate.get('second'));
+    }
+
     componentDidMount() {
+        const {stopwatchDidMount} = this.props;
+
         this.startStopwatch();
+        stopwatchDidMount();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        console.log("componentDidUpdate");
+        const {stopwatchDidUpdate} = this.props;
+        stopwatchDidUpdate();
     }
 
     componentWillUnmount() {
         this.cleanTimer();
+        const {stopwatchWillUnmount} = this.props;
+        stopwatchWillUnmount();
     }
 
     render() {
